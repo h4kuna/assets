@@ -13,11 +13,9 @@ extensions:
 	assetsExtension: h4kuna\Assets\DI\AssetsExtension
 
 assetsExtension:
-	version: 2017-04-17 # YYYY-MM-DD # any production flag, like last day or build number
-
 	# optional
 	wwwDir: %wwwDir% # Where is your www dir?
-	debugMode: %debugMode% # If you need production behavior.
+	tempDir: %tempDir% # If you want change temp dir.
 ```
 How to use in latte. After install extension, you have available filter **asset**.
 
@@ -29,16 +27,10 @@ How to use in latte. After install extension, you have available filter **asset*
 <script src="{='js/main.js'|asset}"></script>
 ```
 
-Output with development mode looks like ``?file mtime``.
+Output looks like ``?file mtime``.
 ```html
 <link rel="stylesheet" href="/css/main.css?123456">
 <script src="/js/main.js?456789"></script>
-```
-
-Output with production mode looks like.
-```html
-<link rel="stylesheet" href="/css/main.css?2017-04-17">
-<script src="/js/main.js?2017-04-17"></script>
 ```
 
 Absolute path is posible with double slash.

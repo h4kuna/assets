@@ -12,9 +12,10 @@
 		}
 	],
 	"require": {
-		"nette/bootstrap": "~2.0",
+		"latte/latte": "~2.0",
 		"nette/application": "~2.0",
-		"latte/latte": "~2.0"
+		"nette/bootstrap": "~2.0",
+		"nette/utils": "~2.0"
 	},
 	"autoload": {
 		"psr-4": {

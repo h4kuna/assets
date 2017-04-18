@@ -8,6 +8,4 @@ extensions:
 	assetsExtension: h4kuna\Assets\DI\AssetsExtension
 
 assetsExtension:
-	version: '2017-04-17'
-	debugMode: FALSE
 	wwwDir: %appDir%
