@@ -1,0 +1,27 @@
+{
+	"name": "h4kuna/assets",
+	"type": "library",
+	"description": "Support mtime for assets on development machine.",
+	"homepage": "https://github.com/h4kuna/assets",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Milan Matějček",
+			"email": "milan.matejcek@gmail.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"nette/bootstrap": "~2.0",
+		"nette/application": "~2.0",
+		"latte/latte": "~2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"h4kuna\\Assets\\": "src/"
+		}
+	},
+	"require-dev": {
+		"salamium/testinium": "~0.1"
+	}
+}
