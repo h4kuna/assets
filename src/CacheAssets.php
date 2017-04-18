@@ -18,8 +18,11 @@ class CacheAssets
 
 	public function __construct($tempDir)
 	{
-		Utils\FileSystem::createDir($tempDir);
 		$this->tempFile = $tempDir . DIRECTORY_SEPARATOR . '_assets';
+		if (!is_file($this->tempFile)) {
+			Utils\FileSystem::createDir($tempDir);
+			$this->saveFile(array());
+		}
 	}
 
 	/**
@@ -38,12 +41,7 @@ class CacheAssets
 
 	private function loadCache()
 	{
-		if ($this->files !== NULL) {
-			return;
-		}
-
-		$this->files = array();
-		if (is_file($this->tempFile)) {
+		if ($this->files === NULL) {
 			$this->files = require $this->tempFile;
 		}
 	}
@@ -58,10 +56,15 @@ class CacheAssets
 		return $mtime;
 	}
 
+	private function saveFile(array $data)
+	{
+		file_put_contents($this->tempFile, '<?php return ' . var_export($data, TRUE) . ';');
+	}
+
 	public function __destruct()
 	{
 		if ($this->save === TRUE) {
-			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, TRUE) . ';');
+			$this->saveFile($this->files);
 		}
 	}
 
