@@ -39,6 +39,15 @@ class CacheAssets
 		return $this->save($pathname);
 	}
 
+	/**
+	 * Clear local cache
+	 */
+	public function clear()
+	{
+		$this->files = array();
+		unlink($this->tempFile);
+	}
+
 	private function loadCache()
 	{
 		if ($this->files === NULL) {
