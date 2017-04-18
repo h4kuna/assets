@@ -21,7 +21,7 @@ class CacheAssets
 		$this->tempFile = $tempDir . DIRECTORY_SEPARATOR . '_assets';
 		if (!is_file($this->tempFile)) {
 			Utils\FileSystem::createDir($tempDir);
-			$this->saveFile(array());
+			$this->files = array();
 		}
 	}
 
@@ -56,15 +56,10 @@ class CacheAssets
 		return $mtime;
 	}
 
-	private function saveFile(array $data)
-	{
-		file_put_contents($this->tempFile, '<?php return ' . var_export($data, TRUE) . ';');
-	}
-
 	public function __destruct()
 	{
 		if ($this->save === TRUE) {
-			$this->saveFile($this->files);
+			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, TRUE) . ';');
 		}
 	}
 
