@@ -7,6 +7,9 @@ use Nette\Utils;
 class CacheAssets
 {
 
+	/** @var bool */
+	private $debugMode;
+
 	/** @var string */
 	private $tempFile;
 
@@ -16,8 +19,9 @@ class CacheAssets
 	/** @var bool */
 	private $save = FALSE;
 
-	public function __construct($tempDir)
+	public function __construct($debugMode, $tempDir)
 	{
+		$this->debugMode = $debugMode;
 		$this->tempFile = $tempDir . DIRECTORY_SEPARATOR . '_assets';
 		if (!is_file($this->tempFile)) {
 			Utils\FileSystem::createDir($tempDir);
@@ -45,13 +49,19 @@ class CacheAssets
 	public function clear()
 	{
 		$this->files = array();
-		unlink($this->tempFile);
+		if (is_file($this->tempFile)) {
+			unlink($this->tempFile);
+		}
 	}
 
 	private function loadCache()
 	{
 		if ($this->files === NULL) {
-			$this->files = require $this->tempFile;
+			if ($this->debugMode === TRUE) {
+				$this->files = array();
+			} else {
+				$this->files = require $this->tempFile;
+			}
 		}
 	}
 
@@ -59,15 +69,13 @@ class CacheAssets
 	{
 		$mtime = filemtime($pathname);
 		$this->files[$pathname] = $mtime;
-		if ($this->save === FALSE) {
-			$this->save = TRUE;
-		}
+		$this->save = TRUE;
 		return $mtime;
 	}
 
 	public function __destruct()
 	{
-		if ($this->save === TRUE) {
+		if ($this->debugMode === FALSE && $this->save === TRUE) {
 			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, TRUE) . ';');
 		}
 	}

@@ -9,3 +9,7 @@ extensions:
 
 assetsExtension:
 	wwwDir: %appDir%
+	# optional
+	debugMode: FALSE
+	# tempDir: %tempDir%
+	# cacheBuilder: \CacheBuilder # default NULL
