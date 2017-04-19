@@ -31,7 +31,7 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 			->addSetup('addFilter', array('asset', new NDI\Statement("array(?, 'createUrl')", array($assetFile))));
 
 		// build own cache
-		if ($config['cacheBuilder']) {
+		if ($config['cacheBuilder'] && $config['debugMode'] === FALSE) {
 			$this->createAssetsCache($config);
 		}
 	}

@@ -45,7 +45,7 @@ This create cache in compile time, default is on fly.
 
 ```sh
 assetsExtension:
-	cacheFactory: \CacheBuilder
+	cacheBuilder: \CacheBuilder
 ```
 
 Use prepared interface

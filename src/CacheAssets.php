@@ -31,7 +31,7 @@ class CacheAssets
 
 	/**
 	 * @param string $pathname
-	 * @return int|NULL
+	 * @return int
 	 */
 	public function load($pathname)
 	{
@@ -40,7 +40,8 @@ class CacheAssets
 			return $this->files[$pathname];
 		}
 
-		return $this->save($pathname);
+		$this->save = TRUE;
+		return $this->files[$pathname] = filemtime($pathname);
 	}
 
 	/**
@@ -49,28 +50,18 @@ class CacheAssets
 	public function clear()
 	{
 		$this->files = array();
-		if (is_file($this->tempFile)) {
-			unlink($this->tempFile);
-		}
+		$this->save = TRUE;
 	}
 
 	private function loadCache()
 	{
-		if ($this->files === NULL) {
-			if ($this->debugMode === TRUE) {
-				$this->files = array();
-			} else {
-				$this->files = require $this->tempFile;
-			}
+		if ($this->files !== NULL) {
+			return;
+		} elseif ($this->debugMode === TRUE) {
+			$this->files = array();
+		} else {
+			$this->files = require $this->tempFile;
 		}
-	}
-
-	private function save($pathname)
-	{
-		$mtime = filemtime($pathname);
-		$this->files[$pathname] = $mtime;
-		$this->save = TRUE;
-		return $mtime;
 	}
 
 	public function __destruct()
