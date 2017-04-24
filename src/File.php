@@ -25,15 +25,13 @@ class File
 
 	public function createUrl($file)
 	{
-		$fsPath = $this->rootFs . DIRECTORY_SEPARATOR . $file;
-
 		$host = $this->url->getBasePath();
 		if (substr($file, 0, 2) == '//') {
 			$host = $this->url->getHostUrl() . '/';
 			$file = substr($file, 2);
 		}
 
-		return $host . $file . '?' . $this->cache->load($fsPath);
+		return $host . $file . '?' . $this->cache->load($this->rootFs . DIRECTORY_SEPARATOR . $file);
 	}
 
 }

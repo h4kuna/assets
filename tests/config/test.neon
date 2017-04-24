@@ -4,6 +4,10 @@ php:
 application:
 	scanDirs: FALSE
 
+services:
+	myRequestFactory: Salamium\Testinium\HttpRequestFactory
+	http.request: @myRequestFactory::create('')
+
 extensions:
 	assetsExtension: h4kuna\Assets\DI\AssetsExtension
 

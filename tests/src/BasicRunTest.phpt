@@ -14,4 +14,4 @@ Assert::true($file instanceof Assets\File);
 
 Assert::same('/config/php-unix.ini?536284800', $file->createUrl('config/php-unix.ini'));
 
-$file->createUrl('config/test.neon');
+Assert::same('//www.example.com/config/test.neon', preg_replace('~\?.*~', '', $file->createUrl('//config/test.neon')));
