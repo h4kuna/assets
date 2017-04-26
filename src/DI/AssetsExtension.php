@@ -11,7 +11,7 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 	private $defaults = array(
 		'debugMode' => '%debugMode%',
 		'wwwDir' => '%wwwDir%',
-		'tempDir' => '%tempDir%',
+		'tempDir' => '%tempDir%/cache',
 		'cacheBuilder' => NULL
 	);
 
