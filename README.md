@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/h4kuna/assets.svg?branch=master)](https://travis-ci.org/h4kuna/assets)
+[![Downloads this Month](https://img.shields.io/packagist/dm/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
+[![Latest stable](https://img.shields.io/packagist/v/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
 
 If you need automaticly invalid browser cache on development machine, use this extension.
 
@@ -7,6 +10,10 @@ $ composer require h4kuna/assets
 ```
 
 PHP: 5.3+
+
+How to use
+==========
+For first step you need only register extension, other parameters are optional. You have available new filter **asset** automaticaly.
 
 ```sh
 extensions:
@@ -18,11 +25,12 @@ assetsExtension:
 	wwwDir: %wwwDir% # Where is your www dir?
 	tempDir: %tempDir% # If you want change temp dir.
 ```
-How to use in latte. After install extension, you have available filter **asset**.
+Advantigies.
 
 - $basePath is not need
 - path is relative to your wwwDir
 - cache is build if found unknown file
+- behavior is same on production and develop machine
 
 ```html
 <link rel="stylesheet" href="{='css/main.css'|asset}">
@@ -40,7 +48,7 @@ Absolute path is posible with double slash.
 <link rel="stylesheet" href="{='//css/main.css'|asset}">
 ```
 
-### Own cache builder
+### Own cache builder - advanced use
 This create cache in compile time, default is on fly.
 
 ```sh
