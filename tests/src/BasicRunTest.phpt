@@ -7,10 +7,10 @@ $container = require __DIR__ . '/../bootsrap.php';
 
 touch(__DIR__ . '/../config/php-unix.ini', 536284800);
 
-/* @var $file Fio\Nette\FioFactory */
+/* @var $file Assets\File */
 $file = $container->getByType(Assets\File::class);
 
-Assert::true($file instanceof Assets\File);
+Assert::type(Assets\File::class, $file);
 
 Assert::same('/config/php-unix.ini?536284800', $file->createUrl('config/php-unix.ini'));
 
