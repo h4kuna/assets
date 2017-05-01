@@ -25,7 +25,7 @@ class CacheAssets
 		$this->tempFile = $tempDir . DIRECTORY_SEPARATOR . '_assets';
 		if (!is_file($this->tempFile)) {
 			Utils\FileSystem::createDir($tempDir);
-			$this->files = array();
+			$this->files = [];
 		}
 	}
 
@@ -49,7 +49,7 @@ class CacheAssets
 	 */
 	public function clear()
 	{
-		$this->files = array();
+		$this->files = [];
 		$this->save = TRUE;
 	}
 
@@ -58,7 +58,7 @@ class CacheAssets
 		if ($this->files !== NULL) {
 			return;
 		} elseif ($this->debugMode === TRUE) {
-			$this->files = array();
+			$this->files = [];
 		} else {
 			$this->files = require $this->tempFile;
 		}

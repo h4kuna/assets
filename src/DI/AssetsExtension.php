@@ -8,12 +8,12 @@ use h4kuna\Assets,
 class AssetsExtension extends \Nette\DI\CompilerExtension
 {
 
-	private $defaults = array(
+	private $defaults = [
 		'debugMode' => '%debugMode%',
 		'wwwDir' => '%wwwDir%',
 		'tempDir' => '%tempDir%/cache',
 		'cacheBuilder' => NULL
-	);
+	];
 
 	public function loadConfiguration()
 	{
@@ -21,14 +21,14 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$cacheAssets = $builder->addDefinition($this->prefix('cache'))
-			->setClass('h4kuna\\Assets\\CacheAssets', array($config['debugMode'], $config['tempDir']))
+			->setClass(Assets\CacheAssets::class, [$config['debugMode'], $config['tempDir']])
 			->setAutowired(FALSE);
 
 		$assetFile = $builder->addDefinition($this->prefix('file'))
-			->setClass('h4kuna\\Assets\\File', array($config['wwwDir'], $cacheAssets));
+			->setClass(Assets\File::class, [$config['wwwDir'], $cacheAssets]);
 
 		$builder->getDefinition('latte.latteFactory')
-			->addSetup('addFilter', array('asset', new NDI\Statement("array(?, 'createUrl')", array($assetFile))));
+			->addSetup('addFilter', ['asset', new NDI\Statement("array(?, 'createUrl')", [$assetFile])]);
 
 		// build own cache
 		if ($config['cacheBuilder'] && $config['debugMode'] === FALSE) {

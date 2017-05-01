@@ -9,7 +9,7 @@ Install via composer.
 $ composer require h4kuna/assets
 ```
 
-PHP: 5.3+
+Version 0.1.3 support PHP 5.3. Newer support PHP 5.6+.
 
 How to use
 ==========
