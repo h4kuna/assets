@@ -28,7 +28,7 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 			->setClass(Assets\File::class, [$config['wwwDir'], new NDI\Statement('?->getUrl()', ['@http.request']), $cacheAssets]);
 
 		$builder->getDefinition('latte.latteFactory')
-			->addSetup('addFilter', ['asset', new NDI\Statement("array(?, 'createUrl')", [$assetFile])]);
+			->addSetup('addFilter', ['asset', new NDI\Statement("[?, 'createUrl']", [$assetFile])]);
 
 		// build own cache
 		if ($config['cacheBuilder'] && $config['debugMode'] === FALSE) {

@@ -65,9 +65,22 @@ class CacheBuilder implements \h4kuna\Assets\DI\ICacheBuilder
 		$finder = Nette\Utils\Finder::findFiles('*')->in($wwwDir . '/config');
 		foreach ($finder as $file) {
 			/* @var $file \SplFileInfo */
-			$cache->load($file->getPathname());
+			$cache->load(self::replaceSlashOnWindows($file));
+		}
+	}
+
+
+	private static function replaceSlashOnWindows(SplFileInfo $file)
+	{
+		static $isWindows;
+		if ($isWindows === NULL) {
+			$isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 		}
 
+		if ($isWindows) {
+			return str_replace('\\', '/', $file->getPathname());
+		}
+		return $file->getPathname();
 	}
 }
 ```
