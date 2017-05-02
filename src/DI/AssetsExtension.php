@@ -25,7 +25,7 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 			->setAutowired(FALSE);
 
 		$assetFile = $builder->addDefinition($this->prefix('file'))
-			->setClass(Assets\File::class, [$config['wwwDir'], $cacheAssets]);
+			->setClass(Assets\File::class, [$config['wwwDir'], new NDI\Statement('?->getUrl()', ['@http.request']), $cacheAssets]);
 
 		$builder->getDefinition('latte.latteFactory')
 			->addSetup('addFilter', ['asset', new NDI\Statement("array(?, 'createUrl')", [$assetFile])]);

@@ -16,11 +16,11 @@ class File
 	/** @var Http\Url */
 	private $url;
 
-	public function __construct($rootFs, CacheAssets $cache, Http\Request $request)
+	public function __construct($rootFs, Http\UrlScript $url, CacheAssets $cache)
 	{
 		$this->rootFs = $rootFs;
 		$this->cache = $cache;
-		$this->url = $request->getUrl();
+		$this->url = $url;
 	}
 
 	public function createUrl($file)
