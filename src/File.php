@@ -10,11 +10,11 @@ class File
 	/** @var string */
 	private $rootFs;
 
-	/** @var CacheAssets */
-	private $cache;
-
 	/** @var Http\Url */
 	private $url;
+
+	/** @var CacheAssets */
+	private $cache;
 
 	/** @var string */
 	private $hostUrl;
@@ -22,19 +22,20 @@ class File
 	/** @var string */
 	private $basePath;
 
-	public function __construct($rootFs, Http\UrlScript $url, CacheAssets $cache)
+	public function __construct($rootFs, Http\Url $url, CacheAssets $cache)
 	{
 		$this->rootFs = $rootFs;
-		$this->cache = $cache;
 		$this->url = $url;
+		$this->cache = $cache;
 	}
 
 	public function createUrl($file)
 	{
-		$host = $this->getBasePath();
 		if (substr($file, 0, 2) == '//') {
 			$host = $this->getHostUrl() . '/';
 			$file = substr($file, 2);
+		} else {
+			$host = $this->getBasePath();
 		}
 
 		return $host . $file . '?' . $this->cache->load($this->rootFs . DIRECTORY_SEPARATOR . $file);
