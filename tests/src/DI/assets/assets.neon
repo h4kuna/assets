@@ -1,0 +1,8 @@
+php:
+    date.timezone: Europe/Prague
+
+application:
+	scanDirs: FALSE
+
+extensions:
+	assetsExtension: h4kuna\Assets\DI\AssetsExtension

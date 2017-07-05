@@ -24,7 +24,7 @@ class Assets
 	public function addCss($filename, array $attributes = [])
 	{
 		if ($this->css === NULL) {
-			throw new \RuntimeException('You try add file after renderCss().');
+			throw new InvalidStateException('You try add file after renderCss().');
 		}
 		$this->css[$filename] = $attributes;
 		return $this;
@@ -33,7 +33,7 @@ class Assets
 	public function addJs($filename, array $attributes = [])
 	{
 		if ($this->js === NULL) {
-			throw new \RuntimeException('You try add file after renderJs().');
+			throw new InvalidStateException('You try add file after renderJs().');
 		}
 		$this->js[$filename] = $attributes;
 		return $this;
@@ -43,7 +43,7 @@ class Assets
 	public function renderCss()
 	{
 		if ($this->css === NULL) {
-			throw new \RuntimeException('renderCss() call onetime per life.');
+			throw new InvalidStateException('renderCss() call onetime per life.');
 		}
 		$out = new Utils\Html;
 		foreach ($this->css as $filename => $attributes) {
@@ -61,12 +61,11 @@ class Assets
 	public function renderJs()
 	{
 		if ($this->js === NULL) {
-			throw new \RuntimeException('renderJs() call onetime per life.');
+			throw new InvalidStateException('renderJs() call onetime per life.');
 		}
 		$out = new Utils\Html;
 		foreach ($this->js as $filename => $attributes) {
 			$out[] = Utils\Html::el('script', [
-					'type' => 'text/javascript',
 					'src' => $this->createUrl($filename)
 					] + $attributes);
 		}

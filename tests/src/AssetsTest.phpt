@@ -11,7 +11,7 @@ function test(\Closure $closure)
 
 $container = require __DIR__ . '/../bootsrap.php';
 
-$time = 536284800;
+$time = 1490036475;
 touch(__DIR__ . '/../config/php-unix.ini', $time);
 
 test(function() use ($container, $time) {
@@ -20,15 +20,15 @@ test(function() use ($container, $time) {
 	$assets->addJs('//example.com/foo.js');
 	$assets->addJs('http://example.com/foo.js');
 	$assets->addJs('config/php-unix.ini');
-	Assert::same('<script type="text/javascript" src="//example.com/foo.js"></script><script type="text/javascript" src="http://example.com/foo.js"></script><script type="text/javascript" src="/config/php-unix.ini?' . $time . '"></script>', (string) $assets->renderJs());
+	Assert::same('<script src="//example.com/foo.js"></script><script src="http://example.com/foo.js"></script><script src="/config/php-unix.ini?' . $time . '"></script>', (string) $assets->renderJs());
 
 	Assert::exception(function() use ($assets) {
 		Assert::same('', (string) $assets->renderJs());
-	}, \RuntimeException::class);
+	}, InvalidStateException::class);
 
 	Assert::exception(function() use ($assets) {
 		$assets->addJs('config/php-unix.ini');
-	}, \RuntimeException::class);
+	}, InvalidStateException::class);
 });
 
 
@@ -39,10 +39,10 @@ test(function() use ($container, $time) {
 
 	Assert::exception(function() use ($assets) {
 		Assert::same('', (string) $assets->renderCss());
-	}, \RuntimeException::class);
+	}, InvalidStateException::class);
 
 
 	Assert::exception(function() use ($assets) {
 		$assets->addCss('foo.css');
-	}, \RuntimeException::class);
+	}, InvalidStateException::class);
 });

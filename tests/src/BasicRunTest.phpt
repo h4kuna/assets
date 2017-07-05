@@ -5,7 +5,7 @@ use h4kuna\Assets,
 
 $container = require __DIR__ . '/../bootsrap.php';
 
-$time = 536284800;
+$time = 1490036475; // mtime jsquery
 touch(__DIR__ . '/../config/php-unix.ini', $time);
 
 /* @var $file Assets\File */
@@ -16,3 +16,5 @@ Assert::type(Assets\File::class, $file);
 Assert::same('/config/php-unix.ini?' . $time, $file->createUrl('config/php-unix.ini'));
 
 Assert::same('//www.example.com/config/test.neon', preg_replace('~\?.*~', '', $file->createUrl('//config/test.neon')));
+
+Assert::same('/temp/jquery-3.2.1.min.js?' . $time, $file->createUrl('temp/jquery-3.2.1.min.js'));

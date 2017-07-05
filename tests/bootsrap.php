@@ -9,6 +9,7 @@ $configurator = new Nette\Configurator;
 $tmp = __DIR__ . '/temp';
 $configurator->enableDebugger($tmp);
 $configurator->setTempDirectory($tmp);
+$configurator->addParameters(['wwwDir' => __DIR__]);
 $configurator->setDebugMode(FALSE);
 $configurator->addConfig(__DIR__ . '/config/test.neon');
 $local = __DIR__ . '/config/test.local.neon';

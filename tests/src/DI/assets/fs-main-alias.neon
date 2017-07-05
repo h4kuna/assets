@@ -1,0 +1,3 @@
+assetsExtension:
+	externalAssets:
+		'app/index.js': %appDir%/assets/main.js
