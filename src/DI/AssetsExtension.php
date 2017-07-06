@@ -27,6 +27,9 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 		$assetFile = $builder->addDefinition($this->prefix('file'))
 			->setClass(Assets\File::class, [$config['wwwDir'], new NDI\Statement('?->getUrl()', ['@http.request']), $cacheAssets]);
 
+		$builder->addDefinition($this->prefix('assets'))
+			->setClass(Assets\Assets::class);
+
 		$builder->getDefinition('latte.latteFactory')
 			->addSetup('addFilter', ['asset', new NDI\Statement("[?, 'createUrl']", [$assetFile])]);
 
