@@ -27,10 +27,11 @@ test(function() use ($container, $time) {
 });
 
 
-test(function() use ($container, $time) {
+test(function() use ($container) {
 	/* @var $assets Assets */
 	$assets = $container->getByType(Assets::class);
-	Assert::same('', (string) $assets->renderCss());
+	$assets->addCss('//example.com/foo.css');
+	Assert::same('<link rel="stylesheet" type="text/css" href="//example.com/foo.css">', (string) $assets->renderCss());
 
 	Assert::exception(function() use ($assets) {
 		Assert::same('', (string) $assets->renderCss());
