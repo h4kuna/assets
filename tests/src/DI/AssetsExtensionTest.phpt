@@ -55,27 +55,28 @@ Assert::exception(function() {
 	configuratorFactory('file-not-found.neon');
 }, Assets\FileNotFoundException::class);
 
+
 Assert::exception(function() {
 	configuratorFactory('fs-main.neon', TRUE);
 }, Assets\DirectoryIsNotWriteableException::class);
 
-$x = function() {
+
+test(function() {
 	touch(__DIR__ . '/assets/main.js', 123456789);
 	$container = configuratorFactory('fs-main.neon');
 	$file = $container->getByType(Assets\File::class);
 	/* @var $file \h4kuna\Assets\File */
 	Assert::same('/temp/main.js?123456789', $file->createUrl('temp/main.js'));
-};
-$x();
+});
 
-$x = function() {
+
+test(function() {
 	touch(__DIR__ . '/assets/main.js', 123456789);
 	$container = configuratorFactory('fs-main-alias.neon');
 	$file = $container->getByType(Assets\File::class);
 	/* @var $file \h4kuna\Assets\File */
 	Assert::same('/temp/app/index.js?123456789', $file->createUrl('temp/app/index.js'));
-};
-$x();
+});
 
 
 Assert::exception(function() {

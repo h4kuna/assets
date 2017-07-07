@@ -6,7 +6,7 @@ php:
 
 before_script:
   - composer self-update
-  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then NTESTER_FLAGS="phpdbg --coverage ./coverage.xml --coverage-src ./src"; else TESTER_FLAGS=""; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then NTESTER_FLAGS="phpdbg --coverage ./coverage.xml --coverage-src ./src"; else NTESTER_FLAGS=""; fi
 
 after_script:
     - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then

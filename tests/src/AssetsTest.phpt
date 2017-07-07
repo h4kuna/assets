@@ -6,8 +6,7 @@ use Tester\Assert;
 
 $container = require __DIR__ . '/../bootsrap.php';
 
-$time = 1490036475;
-touch(__DIR__ . '/../config/php-unix.ini', $time);
+$time = filemtime(__DIR__ . '/../config/php-unix.ini');
 
 test(function() use ($container, $time) {
 	/* @var $assets Assets */
