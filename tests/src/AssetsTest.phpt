@@ -4,11 +4,6 @@ namespace h4kuna\Assets;
 
 use Tester\Assert;
 
-function test(\Closure $closure)
-{
-	$closure();
-}
-
 $container = require __DIR__ . '/../bootsrap.php';
 
 $time = 1490036475;

@@ -20,6 +20,11 @@ $container = $configurator->createContainer();
 
 \Tracy\Debugger::enable(FALSE);
 
+function test(\Closure $closure)
+{
+	$closure();
+}
+
 return $container;
 
 
