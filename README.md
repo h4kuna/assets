@@ -22,8 +22,15 @@ extensions:
 assetsExtension:
 	# optional
 	debugMode: %debugMode%
-	wwwDir: %wwwDir% # Where is your www dir?
 	tempDir: %tempDir% # If you want change temp dir.
+	wwwTempDir: %wwwDir/temp% # here is place where move assets from 3rd library (from vendor/ etc.)
+	externalAssets:
+	    - %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/nette.js
+        'ext/nette2.4.js': %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/ext/nette2.4.js
+
+        # download from external source, this is experimental!
+		- http://example.com/foo.js # save to %wwwTempDir%/foo.js
+		'sha256-secure-token': http://example.com/foo.js # check if is right file
 ```
 Advantigies.
 
@@ -46,6 +53,18 @@ Output looks like ``?file mtime``.
 Absolute path is posible with double slash.
 ```html
 <link rel="stylesheet" href="{='//css/main.css'|asset}">
+```
+
+### Assets
+Here is object whose can have dependency anything and collect css and js files for render to template.
+```php
+/* @var $assets \h4kuna\Assets\Assets */
+$assets->addJs('ext/nette2.4.js', ['async' => TRUE]);
+echo (string) $assets->renderJs();
+```
+render this
+```html
+<script src="/temp/ext/nette2.4.js?456789" async></script>
 ```
 
 ### Own cache builder - advanced use
