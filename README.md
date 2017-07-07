@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/h4kuna/assets.svg?branch=master)](https://travis-ci.org/h4kuna/assets)
 [![Downloads this Month](https://img.shields.io/packagist/dm/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
 [![Latest stable](https://img.shields.io/packagist/v/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
+[![Coverage Status](https://coveralls.io/repos/github/h4kuna/assets/badge.svg?branch=master)](https://coveralls.io/github/h4kuna/assets?branch=master)
 
 If you need automaticly invalid browser cache on development machine, use this extension.
 
