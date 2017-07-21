@@ -3,18 +3,18 @@
 [![Latest stable](https://img.shields.io/packagist/v/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
 [![Coverage Status](https://coveralls.io/repos/github/h4kuna/assets/badge.svg?branch=master)](https://coveralls.io/github/h4kuna/assets?branch=master)
 
-If you need automaticly invalid browser cache on development machine, use this extension.
+If you need the browser to automatically invalid it's cache, use this extension.
 
-Install via composer.
+Install via composer:
 ```sh
 $ composer require h4kuna/assets
 ```
 
-Version 0.1.3 support PHP 5.3. Newer support PHP 5.6+.
+Version 0.1.3 supports PHP 5.3. Newer versions support PHP of version 5.6 and higher.
 
 How to use
 ==========
-For first step you need only register extension, other parameters are optional. You have available new filter **asset** automaticaly.
+For first step you only need to register the extension, other parameters are optional. You have available the new filter **asset** automatically.
 
 ```sh
 extensions:
@@ -33,31 +33,33 @@ assetsExtension:
 		- http://example.com/foo.js # save to %wwwTempDir%/foo.js
 		'sha256-secure-token': http://example.com/foo.js # check if is right file
 ```
-Advantigies.
 
-- $basePath is not need
+Advantages:
+
+- $basePath is not needed
 - path is relative to your wwwDir
-- cache is build if found unknown file
-- behavior is same on production and develop machine
+- cache is built when new file found
+- behavior is the same in production and development environment
 
 ```html
 <link rel="stylesheet" href="{='css/main.css'|asset}">
 <script src="{='js/main.js'|asset}"></script>
 ```
 
-Output looks like ``?file mtime``.
+Example output:
+``?file mtime``.
 ```html
 <link rel="stylesheet" href="/css/main.css?123456">
 <script src="/js/main.js?456789"></script>
 ```
 
-Absolute path is posible with double slash.
+Printing absolute path to the template can be anabled using double slash:
 ```html
 <link rel="stylesheet" href="{='//css/main.css'|asset}">
 ```
 
 ### Assets
-Here is object whose can have dependency anything and collect css and js files for render to template.
+Here is an object that can have dependency anything and collect css and js files for render to template.
 ```php
 /* @var $assets \h4kuna\Assets\Assets */
 $assets->addJs('ext/nette2.4.js', ['async' => TRUE]);
@@ -68,15 +70,15 @@ render this
 <script src="/temp/ext/nette2.4.js?456789" async></script>
 ```
 
-### Own cache builder - advanced use
-This create cache in compile time, default is on fly.
+### Custom cache builder - advanced usege
+This creates the cache in the compile time. By default, assets cache is build on the fly:
 
 ```sh
 assetsExtension:
 	cacheBuilder: \CacheBuilder
 ```
 
-Use prepared interface
+Use prepared interface:
 ```php
 class CacheBuilder implements \h4kuna\Assets\DI\ICacheBuilder
 {
