@@ -1,31 +1,17 @@
 <?php
 
 include __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/factory.php';
 
 Tester\Environment::setup();
+date_default_timezone_set('Europe/Prague');
 
-$configurator = new Nette\Configurator;
-
-$tmp = __DIR__ . '/temp';
-$configurator->enableDebugger($tmp);
-$configurator->setTempDirectory($tmp);
-$configurator->addParameters(['wwwDir' => __DIR__]);
-$configurator->setDebugMode(FALSE);
-$configurator->addConfig(__DIR__ . '/config/test.neon');
-$local = __DIR__ . '/config/test.local.neon';
-if (is_file($local)) {
-	$configurator->addConfig($local);
-}
-$container = $configurator->createContainer();
-
-\Tracy\Debugger::enable(FALSE);
+// create temporary directory
+define('TEMP_DIR', __DIR__ . '/temp/' . getmypid());
+Nette\Utils\FileSystem::createDir(TEMP_DIR);
+Tracy\Debugger::enable(FALSE, TEMP_DIR);
 
 function test(\Closure $closure)
 {
 	$closure();
 }
-
-return $container;
-
-
-

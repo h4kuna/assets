@@ -46,11 +46,13 @@ class CacheAssets
 
 	/**
 	 * Clear local cache
+	 * @return self
 	 */
 	public function clear()
 	{
 		$this->files = [];
 		$this->save = TRUE;
+		return $this;
 	}
 
 	private function loadCache()

@@ -24,14 +24,9 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 
 	public function loadConfiguration()
 	{
-		$parameters = $this->getContainerBuilder()->parameters;
-		$this->defaults['debugMode'] = $parameters['debugMode'];
-		$this->defaults['tempDir'] = $parameters['tempDir'] . '/cache';
-		$this->defaults['wwwTempDir'] = $parameters['wwwDir'] . '/temp';
-
-		$config = $this->validateConfig($this->defaults);
-		$config['wwwDir'] = $parameters['wwwDir'];
+		$this->config += $this->defaults;
 		$builder = $this->getContainerBuilder();
+		$config = NDI\Helpers::expand($this->config, $builder->parameters);
 
 		$cacheAssets = $builder->addDefinition($this->prefix('cache'))
 			->setClass(Assets\CacheAssets::class, [$config['debugMode'], $config['tempDir']])
@@ -124,7 +119,8 @@ class AssetsExtension extends \Nette\DI\CompilerExtension
 			throw new Assets\DownloadFaildFromExternalUrlException($url);
 		}
 
-		if (!file_put_contents($filename, $content)) {
+		$isSaved = @file_put_contents($filename, $content);
+		if (!$isSaved) {
 			throw new Assets\DirectoryIsNotWriteableException(dirname($filename));
 		}
 

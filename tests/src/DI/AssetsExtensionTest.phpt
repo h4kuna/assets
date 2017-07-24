@@ -11,16 +11,12 @@ $container = require __DIR__ . '/../../bootsrap.php';
 function configuratorFactory($neon, $subDirOff = FALSE)
 {
 	$configurator = new \Nette\Configurator;
-	$tmp = __DIR__ . '/../../temp/test';
-
-	Utils\FileSystem::delete($tmp);
-	Utils\FileSystem::createDir($tmp);
-
-	$wwwDir = $tmp . '/../www';
+	$tmp = TEMP_DIR;
+	$wwwDir = $tmp . '/www';
 	$subWww = $wwwDir . '/temp';
 
 	@chmod($subWww, 0755);
-	Utils\FileSystem::delete($subWww);
+	Utils\FileSystem::delete($tmp);
 	Utils\FileSystem::createDir($subWww);
 	if ($subDirOff) {
 		chmod($subWww, 0000);
@@ -82,3 +78,26 @@ test(function() {
 Assert::exception(function() {
 	configuratorFactory('duplicity.neon');
 }, Assets\DuplicityAssetNameException::class);
+
+// custom cache builder
+class CacheBuilder implements ICacheBuilder
+{
+
+	public function create(Assets\CacheAssets $cache, $wwwDir)
+	{
+		$mainJs = __DIR__ . '/assets/main.js';
+		touch($mainJs, 123456789);
+		/* @var $file \SplFileInfo */
+		$cache->load($mainJs);
+	}
+
+}
+
+test(function() {
+	$mainJs = __DIR__ . '/assets/main.js';
+	$container = configuratorFactory('pre-cache.neon');
+	$cache = $container->getService('assetsExtension.cache');
+	touch($mainJs, 12345678);
+	Assert::same(123456789, $cache->load($mainJs));
+});
+

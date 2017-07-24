@@ -4,13 +4,13 @@ namespace h4kuna\Assets;
 
 use Tester\Assert;
 
-$container = require __DIR__ . '/../bootsrap.php';
+require __DIR__ . '/../bootsrap.php';
 
-$time = filemtime(__DIR__ . '/../config/php-unix.ini');
+test(function() {
+	$time = filemtime(__DIR__ . '/../config/php-unix.ini');
 
-test(function() use ($container, $time) {
 	/* @var $assets Assets */
-	$assets = $container->getByType(Assets::class);
+	$assets = createAssets();
 	$assets->addJs('//example.com/foo.js');
 	$assets->addJs('http://example.com/foo.js');
 	$assets->addJs('config/php-unix.ini');
@@ -26,9 +26,9 @@ test(function() use ($container, $time) {
 });
 
 
-test(function() use ($container) {
+test(function() {
 	/* @var $assets Assets */
-	$assets = $container->getByType(Assets::class);
+	$assets = createAssets();
 	$assets->addCss('//example.com/foo.css');
 	Assert::same('<link rel="stylesheet" type="text/css" href="//example.com/foo.css">', (string) $assets->renderCss());
 
