@@ -38,7 +38,7 @@ Advantages:
 
 - $basePath is not needed
 - path is relative to your wwwDir
-- cache is built when new file found
+- cache is built when new file found, or if you remove %tempDir%/cache/_assets
 - behavior is the same in production and development environment
 
 ```html
