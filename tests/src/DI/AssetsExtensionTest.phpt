@@ -3,80 +3,70 @@
 namespace h4kuna\Assets\DI;
 
 use h4kuna\Assets,
+	Nette\Bridges,
 	Nette\Utils,
+	Nette\DI AS NDI,
 	Tester\Assert;
 
-$container = require __DIR__ . '/../../bootsrap.php';
+require __DIR__ . '/../../bootsrap.php';
 
-function configuratorFactory($neon, $subDirOff = FALSE)
+function createContainer(array $config)
 {
-	$configurator = new \Nette\Configurator;
-	$tmp = TEMP_DIR;
-	$wwwDir = $tmp . '/www';
-	$subWww = $wwwDir . '/temp';
+	$compiler = new NDI\Compiler();
+	$latteExtension = new Bridges\ApplicationDI\LatteExtension(TEMP_DIR);
+	$httpExtension = new Bridges\HttpDI\HttpExtension();
+	$compiler->addExtension('latte', $latteExtension);
+	$compiler->addExtension('http', $httpExtension);
 
-	@chmod($subWww, 0755);
-	Utils\FileSystem::delete($tmp);
-	Utils\FileSystem::createDir($subWww);
-	if ($subDirOff) {
-		chmod($subWww, 0000);
-	}
+	Utils\FileSystem::createDir(TEMP_DIR . '/temp');
+	$assetsExtension = new AssetsExtension(false, TEMP_DIR, TEMP_DIR);
+	$assetsExtension->setConfig($config);
 
-	$configurator->enableDebugger($tmp);
-	$configurator->addParameters([
-		'wwwDir' => $wwwDir
-	]);
-	$configurator->setTempDirectory($tmp);
-	$configurator->addConfig(__DIR__ . '/assets/assets.neon');
-	$configurator->addConfig(__DIR__ . '/assets/' . $neon);
-	return $configurator->createContainer();
+	$compiler->addExtension('assets', $assetsExtension);
+	//file_put_contents(__DIR__ . '/container.php', "<?php\n" . $compiler->compile());
+	eval($compiler->compile());
+	return new \Container();
 }
 
-Assert::exception(function() {
-	configuratorFactory('external-download-faild.neon');
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => ['http://www.noexists.cl1/js/foo.js']
+	]);
 }, Assets\DownloadFaildFromExternalUrlException::class);
 
-
-Assert::exception(function() {
-	configuratorFactory('permission-denied.neon', TRUE);
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => ['http://www.example.com/'],
+		'wwwTempDir' => TEMP_DIR . '/foo'
+	]);
 }, Assets\DirectoryIsNotWriteableException::class);
 
-
-Assert::exception(function() {
-	configuratorFactory('bad-token.neon');
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => ['sha256-fljdfkuvzddfdvc' => 'http://example.com/']
+	]);
 }, Assets\CompareTokensException::class);
 
-
-Assert::exception(function() {
-	configuratorFactory('file-not-found.neon');
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => [TEMP_DIR . '/_unkown.css']
+	]);
 }, Assets\FileNotFoundException::class);
 
-
-Assert::exception(function() {
-	configuratorFactory('fs-main.neon', TRUE);
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => [__DIR__ . '/assets/main.js'],
+		'wwwTempDir' => '/'
+	]);
 }, Assets\DirectoryIsNotWriteableException::class);
 
-
-test(function() {
-	touch(__DIR__ . '/assets/main.js', 123456789);
-	$container = configuratorFactory('fs-main.neon');
-	$file = $container->getByType(Assets\File::class);
-	/* @var $file \h4kuna\Assets\File */
-	Assert::same('/temp/main.js?123456789', $file->createUrl('temp/main.js'));
-});
-
-
-test(function() {
-	touch(__DIR__ . '/assets/main.js', 123456789);
-	$container = configuratorFactory('fs-main-alias.neon');
-	$file = $container->getByType(Assets\File::class);
-	/* @var $file \h4kuna\Assets\File */
-	Assert::same('/temp/app/index.js?123456789', $file->createUrl('temp/app/index.js'));
-});
-
-
-Assert::exception(function() {
-	configuratorFactory('duplicity.neon');
+Assert::exception(function () {
+	createContainer([
+		'externalAssets' => [
+			'http://example.com/',
+			'example.com' => __DIR__ . '/assets/main.js'
+		],
+	]);
 }, Assets\DuplicityAssetNameException::class);
 
 // custom cache builder
@@ -85,7 +75,7 @@ class CacheBuilder implements ICacheBuilder
 
 	public function create(Assets\CacheAssets $cache, $wwwDir)
 	{
-		$mainJs = __DIR__ . '/assets/main.js';
+		$mainJs = $wwwDir . '/temp/main.js';
 		touch($mainJs, 123456789);
 		/* @var $file \SplFileInfo */
 		$cache->load($mainJs);
@@ -93,11 +83,20 @@ class CacheBuilder implements ICacheBuilder
 
 }
 
-test(function() {
+test(function () {
 	$mainJs = __DIR__ . '/assets/main.js';
-	$container = configuratorFactory('pre-cache.neon');
-	$cache = $container->getService('assetsExtension.cache');
 	touch($mainJs, 12345678);
-	Assert::same(123456789, $cache->load($mainJs));
+	$container = createContainer([
+		'externalAssets' => [
+			0 => __DIR__ . '/assets/main.js',
+			'app/index.js' => __DIR__ . '/assets/main.js',
+			'sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=' => 'https://code.jquery.com/jquery-3.2.1.js',
+		],
+		'cacheBuilder' => \h4kuna\Assets\DI\CacheBuilder::class
+	]);
+	$file = $container->getByType(Assets\File::class);
+	/* @var $file \h4kuna\Assets\File */
+	Assert::same('/temp/main.js?123456789', $file->createUrl('temp/main.js'));
+	Assert::same('/temp/app/index.js?12345678', $file->createUrl('temp/app/index.js'));
+	Assert::type(Assets\CacheAssets::class, $container->getService('assets.cache'));
 });
-

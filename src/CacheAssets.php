@@ -17,7 +17,8 @@ class CacheAssets
 	private $files;
 
 	/** @var bool */
-	private $save = FALSE;
+	private $save = false;
+
 
 	public function __construct($debugMode, $tempDir)
 	{
@@ -28,6 +29,7 @@ class CacheAssets
 			$this->files = [];
 		}
 	}
+
 
 	/**
 	 * @param string $pathname
@@ -40,9 +42,10 @@ class CacheAssets
 			return $this->files[$pathname];
 		}
 
-		$this->save = TRUE;
+		$this->save = true;
 		return $this->files[$pathname] = filemtime($pathname);
 	}
+
 
 	/**
 	 * Clear local cache
@@ -51,25 +54,27 @@ class CacheAssets
 	public function clear()
 	{
 		$this->files = [];
-		$this->save = TRUE;
+		$this->save = true;
 		return $this;
 	}
 
+
 	private function loadCache()
 	{
-		if ($this->files !== NULL) {
+		if ($this->files !== null) {
 			return;
-		} elseif ($this->debugMode === TRUE) {
+		} elseif ($this->debugMode === true) {
 			$this->files = [];
 		} else {
 			$this->files = require $this->tempFile;
 		}
 	}
 
+
 	public function __destruct()
 	{
-		if ($this->debugMode === FALSE && $this->save === TRUE) {
-			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, TRUE) . ';');
+		if ($this->debugMode === false && $this->save === true) {
+			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, true) . ';');
 		}
 	}
 

@@ -21,17 +21,20 @@ extensions:
 	assetsExtension: h4kuna\Assets\DI\AssetsExtension
 
 assetsExtension:
-	# optional
-	debugMode: %debugMode%
-	tempDir: %tempDir% # If you want change temp dir.
-	wwwTempDir: %wwwDir/temp% # here is place where move assets from 3rd library (from vendor/ etc.)
-	externalAssets:
-	    - %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/nette.js
+    # required
+    wwwDir: %wwwDir%
+    debugMode: %debugMode%
+    tempDir: %tempDir%
+    
+    # optional	
+    wwwTempDir: %wwwDir%/temp # here is place where move assets from 3rd library (from vendor/ etc.)
+    externalAssets:
+        - %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/nette.js
         'ext/nette2.4.js': %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/ext/nette2.4.js
-
+        
         # download from external source, this is experimental!
-		- http://example.com/foo.js # save to %wwwTempDir%/foo.js
-		'sha256-secure-token': http://example.com/foo.js # check if is right file
+        - http://example.com/foo.js # save to %wwwTempDir%/foo.js
+        'sha256-secure-token': http://example.com/foo.js # check if is right file
 ```
 
 Advantages:

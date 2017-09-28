@@ -9,7 +9,7 @@ date_default_timezone_set('Europe/Prague');
 // create temporary directory
 define('TEMP_DIR', __DIR__ . '/temp/' . getmypid());
 Nette\Utils\FileSystem::createDir(TEMP_DIR);
-Tracy\Debugger::enable(FALSE, TEMP_DIR);
+Tracy\Debugger::enable(false, TEMP_DIR . '/..');
 
 function test(\Closure $closure)
 {

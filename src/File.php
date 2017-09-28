@@ -22,12 +22,14 @@ class File
 	/** @var string */
 	private $basePath;
 
+
 	public function __construct($rootFs, Http\Url $url, CacheAssets $cache)
 	{
 		$this->rootFs = $rootFs;
 		$this->url = $url;
 		$this->cache = $cache;
 	}
+
 
 	public function createUrl($file)
 	{
@@ -41,18 +43,20 @@ class File
 		return $host . $file . '?' . $this->cache->load($this->rootFs . DIRECTORY_SEPARATOR . $file);
 	}
 
+
 	private function getHostUrl()
 	{
-		if ($this->hostUrl === NULL) {
+		if ($this->hostUrl === null) {
 			$this->hostUrl = $this->url->getHostUrl();
 		}
 
 		return $this->hostUrl;
 	}
 
+
 	private function getBasePath()
 	{
-		if ($this->basePath === NULL) {
+		if ($this->basePath === null) {
 			$this->basePath = $this->url->getBasePath();
 		}
 		return $this->basePath;

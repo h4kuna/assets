@@ -28,6 +28,6 @@ test(function () {
 	sleep(1);
 	touch(__FILE__, time());
 
-	$cache = createCache(TRUE);
+	$cache = createCache(true);
 	Assert::notSame($time, $cache->load(__FILE__));
 });

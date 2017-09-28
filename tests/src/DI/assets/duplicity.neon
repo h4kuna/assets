@@ -1,4 +1,0 @@
-assetsExtension:
-	externalAssets:
-		- http://example.com/
-		'example.com': %appDir%/assets/main.js

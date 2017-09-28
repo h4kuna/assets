@@ -7,11 +7,11 @@ use Tester\Assert;
 require __DIR__ . '/../bootsrap.php';
 
 test(function () {
-	$time = filemtime(__DIR__ . '/../config/php-unix.ini');
+	$time = filemtime(__DIR__ . '/../config/php.ini');
 
 	/* @var $file Assets\File */
-	$file = createFile();
-	Assert::same('/config/php-unix.ini?' . $time, $file->createUrl('config/php-unix.ini'));
+	$file = createFile('//www.example.com');
+	Assert::same('/config/php.ini?' . $time, $file->createUrl('config/php.ini'));
 
-	Assert::same('//www.example.com/config/test.neon', preg_replace('~\?.*~', '', $file->createUrl('//config/test.neon')));
+	Assert::same('//www.example.com/config/php.ini', preg_replace('~\?.*~', '', $file->createUrl('//config/php.ini')));
 });
