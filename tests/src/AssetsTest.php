@@ -18,11 +18,11 @@ test(function () {
 
 	Assert::exception(function () use ($assets) {
 		Assert::same('', (string) $assets->renderJs());
-	}, InvalidStateException::class);
+	}, Exceptions\InvalidStateException::class);
 
 	Assert::exception(function () use ($assets) {
 		$assets->addJs('config/php.ini');
-	}, InvalidStateException::class);
+	}, Exceptions\InvalidStateException::class);
 });
 
 test(function () {
@@ -33,9 +33,9 @@ test(function () {
 
 	Assert::exception(function () use ($assets) {
 		Assert::same('', (string) $assets->renderCss());
-	}, InvalidStateException::class);
+	}, Exceptions\InvalidStateException::class);
 
 	Assert::exception(function () use ($assets) {
 		$assets->addCss('foo.css');
-	}, InvalidStateException::class);
+	}, Exceptions\InvalidStateException::class);
 });

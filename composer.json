@@ -20,10 +20,7 @@
 	"autoload": {
 		"psr-4": {
 			"h4kuna\\Assets\\": "src/"
-		},
-		"files": [
-			"src/exceptions.php"
-		]
+		}
 	},
 	"require-dev": {
 		"salamium/testinium": "^0.1"

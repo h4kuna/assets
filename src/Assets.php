@@ -2,6 +2,7 @@
 
 namespace h4kuna\Assets;
 
+use h4kuna\Assets\Exceptions\InvalidStateException;
 use Nette\Utils;
 
 class Assets

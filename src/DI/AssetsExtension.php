@@ -73,7 +73,7 @@ class AssetsExtension extends NDI\CompilerExtension
 		/* @var $cacheBuilder ICacheBuilder */
 		$cacheBuilder = new $config['cacheBuilder'];
 		if (!$cacheBuilder instanceof ICacheBuilder) {
-			throw new Assets\InvalidArgumentException('Option cacheBuilder must be class instance of ' . __NAMESPACE__ . '\\ICacheBuilder');
+			throw new Assets\Exceptions\InvalidStateException('Option cacheBuilder must be class instance of ' . __NAMESPACE__ . '\\ICacheBuilder');
 		}
 
 		$cache = new Assets\CacheAssets($config['debugMode'], $config['tempDir']);
@@ -108,12 +108,12 @@ class AssetsExtension extends NDI\CompilerExtension
 		}
 		$path = $destination . DIRECTORY_SEPARATOR . $newName;
 		if (!is_file($file)) {
-			throw new Assets\FileNotFoundException($file);
+			throw new Assets\Exceptions\FileNotFoundException($file);
 		}
 		Utils\FileSystem::createDir(dirname($path));
 		$this->checkDuplicity($path);
 		if (!@copy($file, $path)) {
-			throw new Assets\DirectoryIsNotWriteableException(dirname($path));
+			throw new Assets\Exceptions\DirectoryIsNotWriteableException(dirname($path));
 		}
 		return $path;
 	}
@@ -136,19 +136,19 @@ class AssetsExtension extends NDI\CompilerExtension
 
 		$content = @file_get_contents($url);
 		if (!$content) {
-			throw new Assets\DownloadFaildFromExternalUrlException($url);
+			throw new Assets\Exceptions\DownloadFaildFromExternalUrlException($url);
 		}
 
 		$isSaved = @file_put_contents($filename, $content);
 		if (!$isSaved) {
-			throw new Assets\DirectoryIsNotWriteableException(dirname($filename));
+			throw new Assets\Exceptions\DirectoryIsNotWriteableException(dirname($filename));
 		}
 
 		if (!is_numeric($hash)) {
 			list($function, $token) = explode('-', $hash, 2);
 			$secureToken = base64_encode(hash($function, $content, true));
 			if ($secureToken !== $token) {
-				throw new Assets\CompareTokensException('Expected token: ' . $token . ' and actual is: ' . $secureToken . '. Hash function is: "' . $function . '".');
+				throw new Assets\Exceptions\CompareTokensException('Expected token: ' . $token . ' and actual is: ' . $secureToken . '. Hash function is: "' . $function . '".');
 			}
 		}
 
@@ -159,7 +159,7 @@ class AssetsExtension extends NDI\CompilerExtension
 	private function checkDuplicity($filename)
 	{
 		if (isset($this->duplicity[$filename])) {
-			throw new Assets\DuplicityAssetNameException($filename);
+			throw new Assets\Exceptions\DuplicityAssetNameException($filename);
 		}
 		$this->duplicity[$filename] = true;
 	}
@@ -174,7 +174,7 @@ class AssetsExtension extends NDI\CompilerExtension
 
 			return \DateTime::createFromFormat('D, d M Y H:i:s T', $find['date'])->format('U');
 		}
-		throw new Assets\HeaderLastModifyException('Header Last-Modified not found for url: "' . $url . '". You can\'t use this automaticaly download. Let\'s save manualy.');
+		throw new Assets\Exceptions\HeaderLastModifyException('Header Last-Modified not found for url: "' . $url . '". You can\'t use this automatically download. Let\'s save manually.');
 	}
 
 }

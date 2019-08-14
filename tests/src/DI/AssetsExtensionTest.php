@@ -32,33 +32,33 @@ Assert::exception(function () {
 	createContainer([
 		'externalAssets' => ['http://www.noexists.cl1/js/foo.js']
 	]);
-}, Assets\DownloadFaildFromExternalUrlException::class);
+}, Assets\Exceptions\DownloadFaildFromExternalUrlException::class);
 
 Assert::exception(function () {
 	createContainer([
 		'externalAssets' => ['http://www.example.com/'],
 		'wwwTempDir' => TEMP_DIR . '/foo'
 	]);
-}, Assets\DirectoryIsNotWriteableException::class);
+}, Assets\Exceptions\DirectoryIsNotWriteableException::class);
 
 Assert::exception(function () {
 	createContainer([
 		'externalAssets' => ['sha256-fljdfkuvzddfdvc' => 'http://example.com/']
 	]);
-}, Assets\CompareTokensException::class);
+}, Assets\Exceptions\CompareTokensException::class);
 
 Assert::exception(function () {
 	createContainer([
 		'externalAssets' => [TEMP_DIR . '/_unkown.css']
 	]);
-}, Assets\FileNotFoundException::class);
+}, Assets\Exceptions\FileNotFoundException::class);
 
 Assert::exception(function () {
 	createContainer([
 		'externalAssets' => [__DIR__ . '/assets/main.js'],
 		'wwwTempDir' => '/'
 	]);
-}, Assets\DirectoryIsNotWriteableException::class);
+}, Assets\Exceptions\DirectoryIsNotWriteableException::class);
 
 Assert::exception(function () {
 	createContainer([
@@ -67,7 +67,7 @@ Assert::exception(function () {
 			'example.com' => __DIR__ . '/assets/main.js'
 		],
 	]);
-}, Assets\DuplicityAssetNameException::class);
+}, Assets\Exceptions\DuplicityAssetNameException::class);
 
 // custom cache builder
 class CacheBuilder implements ICacheBuilder
