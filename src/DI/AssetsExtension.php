@@ -5,6 +5,11 @@ namespace h4kuna\Assets\DI;
 use h4kuna\Assets,
 	Nette\DI as NDI,
 	Nette\Utils;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
+use stdClass;
+use function print_r;
+use const DIRECTORY_SEPARATOR;
 
 class AssetsExtension extends NDI\CompilerExtension
 {
@@ -12,33 +17,60 @@ class AssetsExtension extends NDI\CompilerExtension
 	/** @var array */
 	private $duplicity = [];
 
-	/** @var array */
-	private $defaults = [
-		// required
-		'debugMode' => false,
-		'wwwDir' => '',
-		'tempDir' => '',
+	/** @var string|null */
+	private $wwwDir;
 
-		// optional
-		'wwwTempDir' => '',
-		'cacheBuilder' => null,
-		'externalAssets' => []
-	];
+	/** @var string|null */
+	private $wwwTempDir;
 
+	/** @var string|null */
+	private $tempDir;
 
-	public function __construct($debugMode = false, $wwwDir = '', $tempDir = '')
+	public function __construct(?string $wwwDir = null, ?string $tempDir = null)
 	{
-		$this->defaults['debugMode'] = $debugMode;
-		$this->defaults['wwwDir'] = $wwwDir;
-		$this->defaults['tempDir'] = $tempDir . DIRECTORY_SEPARATOR . 'cache';
-		$this->defaults['wwwTempDir'] = $wwwDir . '/temp';
+		if ($wwwDir !== null) {
+			$this->wwwDir = $wwwDir;
+			$this->wwwTempDir = $wwwDir . '/temp';
+		}
+
+		if ($tempDir !== null) {
+			$this->tempDir = $tempDir . DIRECTORY_SEPARATOR . 'cache';
+		}
 	}
 
+	public static function createSchema(): Schema
+	{
+		return Expect::structure([
+			'debugMode' => Expect::bool(false),
+			'wwwDir' => Expect::string(''),
+			'tempDir' => Expect::string(''),
+			'wwwTempDir' => Expect::string(''),
+			'cacheBuilder' => Expect::mixed(null),
+			'externalAssets' => Expect::arrayOf('string')
+		]);
+	}
+
+	public function getConfigSchema(): Schema
+	{
+		return self::createSchema();
+	}
 
 	public function loadConfiguration()
 	{
-		$config = $this->config + $this->defaults;
 		$builder = $this->getContainerBuilder();
+		$config = (array) $this->getConfig();
+
+		if ($config['wwwDir'] === '' && $this->wwwDir !== null) {
+			$config['wwwDir'] = $this->wwwDir;
+		}
+
+		if ($config['tempDir'] === '' && $this->tempDir !== null) {
+			$config['tempDir'] = $this->tempDir;
+		}
+
+		if ($config['wwwTempDir'] === '' && $this->wwwTempDir !== null) {
+			$config['wwwTempDir'] = $this->wwwTempDir;
+		}
 
 		$cacheAssets = $builder->addDefinition($this->prefix('cache'))
 			->setFactory(Assets\CacheAssets::class, [$config['debugMode'], $config['tempDir']])
@@ -47,7 +79,7 @@ class AssetsExtension extends NDI\CompilerExtension
 		$assetFile = $builder->addDefinition($this->prefix('file'))
 			->setFactory(Assets\File::class, [
 				$config['wwwDir'],
-				new NDI\Statement('?->getUrl()', ['@http.request']),
+				new \Nette\DI\Definitions\Statement('?->getUrl()', ['@http.request']),
 				$cacheAssets
 			]);
 
@@ -55,7 +87,8 @@ class AssetsExtension extends NDI\CompilerExtension
 			->setFactory(Assets\Assets::class);
 
 		$builder->getDefinition('latte.latteFactory')
-			->addSetup('addFilter', ['asset', new NDI\Statement("[?, 'createUrl']", [$assetFile])]);
+			->getResultDefinition()
+			->addSetup('addFilter', ['asset', new \Nette\DI\Definitions\Statement("[?, 'createUrl']", [$assetFile])]);
 
 		if ($config['externalAssets']) {
 			$this->saveExternalAssets($config['externalAssets'], $config['wwwTempDir']);
@@ -145,7 +178,7 @@ class AssetsExtension extends NDI\CompilerExtension
 		}
 
 		if (!is_numeric($hash)) {
-			list($function, $token) = explode('-', $hash, 2);
+			[$function, $token] = explode('-', $hash, 2);
 			$secureToken = base64_encode(hash($function, $content, true));
 			if ($secureToken !== $token) {
 				throw new Assets\CompareTokensException('Expected token: ' . $token . ' and actual is: ' . $secureToken . '. Hash function is: "' . $function . '".');

@@ -9,7 +9,7 @@ require __DIR__ . '/../bootsrap.php';
 test(function () {
 	$time = filemtime(__DIR__ . '/../config/php.ini');
 
-	/* @var $file Assets\File */
+	/* @var $file File */
 	$file = createFile('//www.example.com');
 	Assert::same('/config/php.ini?' . $time, $file->createUrl('config/php.ini'));
 

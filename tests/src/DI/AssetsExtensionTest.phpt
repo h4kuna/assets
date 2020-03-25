@@ -7,10 +7,11 @@ use h4kuna\Assets,
 	Nette\Utils,
 	Nette\DI AS NDI,
 	Tester\Assert;
+use stdClass;
 
 require __DIR__ . '/../../bootsrap.php';
 
-function createContainer(array $config)
+function createContainer(stdClass $config)
 {
 	$compiler = new NDI\Compiler();
 	$latteExtension = new Bridges\ApplicationDI\LatteExtension(TEMP_DIR);
@@ -19,49 +20,51 @@ function createContainer(array $config)
 	$compiler->addExtension('http', $httpExtension);
 
 	Utils\FileSystem::createDir(TEMP_DIR . '/temp');
-	$assetsExtension = new AssetsExtension(false, TEMP_DIR, TEMP_DIR);
-	$assetsExtension->setConfig($config);
+	$assetsExtension = new AssetsExtension(TEMP_DIR, TEMP_DIR);
+	$compiler->addConfig([
+		'assets' => $config
+	]);
 
 	$compiler->addExtension('assets', $assetsExtension);
-	//file_put_contents(__DIR__ . '/container.php', "<?php\n" . $compiler->compile());
+//	file_put_contents(__DIR__ . '/container.php', "<?php\n" . $compiler->compile());
 	eval($compiler->compile());
 	return new \Container();
 }
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object) [
 		'externalAssets' => ['http://www.noexists.cl1/js/foo.js']
 	]);
 }, Assets\DownloadFaildFromExternalUrlException::class);
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object)[
 		'externalAssets' => ['http://www.example.com/'],
 		'wwwTempDir' => TEMP_DIR . '/foo'
 	]);
 }, Assets\DirectoryIsNotWriteableException::class);
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object)[
 		'externalAssets' => ['sha256-fljdfkuvzddfdvc' => 'http://example.com/']
 	]);
 }, Assets\CompareTokensException::class);
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object)[
 		'externalAssets' => [TEMP_DIR . '/_unkown.css']
 	]);
 }, Assets\FileNotFoundException::class);
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object)[
 		'externalAssets' => [__DIR__ . '/assets/main.js'],
 		'wwwTempDir' => '/'
 	]);
 }, Assets\DirectoryIsNotWriteableException::class);
 
 Assert::exception(function () {
-	createContainer([
+	createContainer((object)[
 		'externalAssets' => [
 			'http://example.com/',
 			'example.com' => __DIR__ . '/assets/main.js'
@@ -86,7 +89,7 @@ class CacheBuilder implements ICacheBuilder
 test(function () {
 	$mainJs = __DIR__ . '/assets/main.js';
 	touch($mainJs, 12345678);
-	$container = createContainer([
+	$container = createContainer((object)[
 		'externalAssets' => [
 			0 => __DIR__ . '/assets/main.js',
 			'app/index.js' => __DIR__ . '/assets/main.js',
