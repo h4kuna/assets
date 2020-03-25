@@ -6,40 +6,71 @@ use h4kuna\Assets;
 use Nette\DI as NDI;
 use Nette\Safe;
 use Nette\Utils;
+use Nette\Schema;
 
 class AssetsExtension extends NDI\CompilerExtension
 {
-
 	/** @var array<string, bool> */
 	private $duplicity = [];
 
-	/** @var array<string, mixed> */
-	private $defaults = [
-		// required
-		'debugMode' => false,
-		'wwwDir' => '',
-		'tempDir' => '',
+	/** @var string|null */
+	private $wwwDir;
 
-		// optional
-		'wwwTempDir' => '',
-		'cacheBuilder' => null,
-		'externalAssets' => [],
-	];
+	/** @var string|null */
+	private $wwwTempDir;
+
+	/** @var string|null */
+	private $tempDir;
 
 
-	public function __construct(bool $debugMode = false, string $wwwDir = '', string $tempDir = '')
+	public function __construct(?string $wwwDir = null, ?string $tempDir = null)
 	{
-		$this->defaults['debugMode'] = $debugMode;
-		$this->defaults['wwwDir'] = $wwwDir;
-		$this->defaults['tempDir'] = $tempDir . DIRECTORY_SEPARATOR . 'cache';
-		$this->defaults['wwwTempDir'] = $wwwDir . '/temp';
+		if ($wwwDir !== null) {
+			$this->wwwDir = $wwwDir;
+			$this->wwwTempDir = $wwwDir . '/temp';
+		}
+
+		if ($tempDir !== null) {
+			$this->tempDir = $tempDir . DIRECTORY_SEPARATOR . 'cache';
+		}
+	}
+
+
+	public static function createSchema(): Schema\Schema
+	{
+		return Schema\Expect::structure([
+			'debugMode' => Schema\Expect::bool(false),
+			'wwwDir' => Schema\Expect::string(''),
+			'tempDir' => Schema\Expect::string(''),
+			'wwwTempDir' => Schema\Expect::string(''),
+			'cacheBuilder' => Schema\Expect::mixed(null),
+			'externalAssets' => Schema\Expect::arrayOf('string')
+		]);
+	}
+
+
+	public function getConfigSchema(): Schema\Schema
+	{
+		return self::createSchema();
 	}
 
 
 	public function loadConfiguration()
 	{
-		$config = $this->config + $this->defaults;
 		$builder = $this->getContainerBuilder();
+		$config = (array) $this->getConfig();
+
+		if ($config['wwwDir'] === '' && $this->wwwDir !== null) {
+			$config['wwwDir'] = $this->wwwDir;
+		}
+
+		if ($config['tempDir'] === '' && $this->tempDir !== null) {
+			$config['tempDir'] = $this->tempDir;
+		}
+
+		if ($config['wwwTempDir'] === '' && $this->wwwTempDir !== null) {
+			$config['wwwTempDir'] = $this->wwwTempDir;
+		}
 
 		$cacheAssets = $builder->addDefinition($this->prefix('cache'))
 			->setFactory(Assets\CacheAssets::class, [$config['debugMode'], $config['tempDir']])
@@ -48,7 +79,7 @@ class AssetsExtension extends NDI\CompilerExtension
 		$assetFile = $builder->addDefinition($this->prefix('file'))
 			->setFactory(Assets\File::class, [
 				$config['wwwDir'],
-				new NDI\Statement('?->getUrl()', ['@http.request']),
+				new \Nette\DI\Definitions\Statement('?->getUrl()', ['@http.request']),
 				$cacheAssets
 			]);
 
@@ -56,7 +87,8 @@ class AssetsExtension extends NDI\CompilerExtension
 			->setFactory(Assets\Assets::class);
 
 		$builder->getDefinition('latte.latteFactory')
-			->addSetup('addFilter', ['asset', new NDI\Statement("[?, 'createUrl']", [$assetFile])]);
+			->getResultDefinition()
+			->addSetup('addFilter', ['asset', new \Nette\DI\Definitions\Statement("[?, 'createUrl']", [$assetFile])]);
 
 		if ($config['externalAssets']) {
 			$this->saveExternalAssets($config['externalAssets'], $config['wwwTempDir']);

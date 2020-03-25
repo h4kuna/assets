@@ -12,11 +12,11 @@
 		}
 	],
 	"require": {
-		"latte/latte": "~2.0",
-		"nette/application": "~2.0",
-		"nette/bootstrap": "~2.0",
+		"latte/latte": "^2.5",
+		"nette/application": "^3.0",
+		"nette/bootstrap": "^3.0",
 		"nette/safe": "^0.9.0",
-		"nette/utils": "~2.0",
+		"nette/utils": "^3.0",
 		"phpstan/phpstan": "^0.12.18"
 	},
 	"autoload": {

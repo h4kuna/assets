@@ -9,7 +9,7 @@ class File
 	/** @var string */
 	private $rootFs;
 
-	/** @var Http\Url */
+	/** @var Http\UrlScript */
 	private $url;
 
 	/** @var CacheAssets */
@@ -22,7 +22,7 @@ class File
 	private $basePath;
 
 
-	public function __construct(string $rootFs, Http\Url $url, CacheAssets $cache)
+	public function __construct(string $rootFs, Http\UrlScript $url, CacheAssets $cache)
 	{
 		$this->rootFs = $rootFs;
 		$this->url = $url;
