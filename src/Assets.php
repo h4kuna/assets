@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets;
 
@@ -7,14 +7,13 @@ use Nette\Utils;
 
 class Assets
 {
-
 	/** @var File */
 	private $file;
 
-	/** @var array */
+	/** @var array<string, array<string, string|int>>|null */
 	private $css = [];
 
-	/** @var array */
+	/** @var array<string, array<string, string|int>>|null */
 	private $js = [];
 
 
@@ -24,7 +23,11 @@ class Assets
 	}
 
 
-	public function addCss($filename, array $attributes = [])
+	/**
+	 * @param array<string, string|int> $attributes
+	 * @return static
+	 */
+	public function addCss(string $filename, array $attributes = [])
 	{
 		if ($this->css === null) {
 			throw new InvalidStateException('You try add file after renderCss().');
@@ -34,7 +37,11 @@ class Assets
 	}
 
 
-	public function addJs($filename, array $attributes = [])
+	/**
+	 * @param array<string, string|int> $attributes
+	 * @return static
+	 */
+	public function addJs(string $filename, array $attributes = [])
 	{
 		if ($this->js === null) {
 			throw new InvalidStateException('You try add file after renderJs().');
@@ -44,8 +51,7 @@ class Assets
 	}
 
 
-	/** @return Utils\Html */
-	public function renderCss()
+	public function renderCss(): Utils\Html
 	{
 		if ($this->css === null) {
 			throw new InvalidStateException('renderCss() call onetime per life.');
@@ -55,7 +61,7 @@ class Assets
 			$out[] = Utils\Html::el('link', [
 					'rel' => 'stylesheet',
 					'type' => 'text/css',
-					'href' => $this->createUrl($filename)
+					'href' => $this->createUrl($filename),
 				] + $attributes);
 		}
 		$this->css = null;
@@ -63,24 +69,23 @@ class Assets
 	}
 
 
-	/** @return Utils\Html */
-	public function renderJs()
+	public function renderJs(): Utils\Html
 	{
 		if ($this->js === null) {
 			throw new InvalidStateException('renderJs() call onetime per life.');
 		}
-		$out = new Utils\Html;
+		$html = new Utils\Html;
 		foreach ($this->js as $filename => $attributes) {
-			$out[] = Utils\Html::el('script', [
-					'src' => $this->createUrl($filename)
+			$html[] = Utils\Html::el('script', [
+					'src' => $this->createUrl($filename),
 				] + $attributes);
 		}
 		$this->js = null;
-		return $out;
+		return $html;
 	}
 
 
-	private function createUrl($filename)
+	private function createUrl(string $filename): string
 	{
 		if (preg_match('~[-a-z0-9]+\.[a-z]{2,6}/~i', $filename)) {
 			// is it contains domain?

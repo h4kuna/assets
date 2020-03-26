@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets;
 
@@ -6,7 +6,6 @@ use Nette\Http;
 
 class File
 {
-
 	/** @var string */
 	private $rootFs;
 
@@ -23,7 +22,7 @@ class File
 	private $basePath;
 
 
-	public function __construct($rootFs, Http\Url $url, CacheAssets $cache)
+	public function __construct(string $rootFs, Http\Url $url, CacheAssets $cache)
 	{
 		$this->rootFs = $rootFs;
 		$this->url = $url;
@@ -31,7 +30,7 @@ class File
 	}
 
 
-	public function createUrl($file)
+	public function createUrl(string $file): string
 	{
 		if (substr($file, 0, 2) == '//') {
 			$host = $this->getHostUrl() . '/';
@@ -44,7 +43,7 @@ class File
 	}
 
 
-	private function getHostUrl()
+	private function getHostUrl(): string
 	{
 		if ($this->hostUrl === null) {
 			$this->hostUrl = $this->url->getHostUrl();
@@ -54,7 +53,7 @@ class File
 	}
 
 
-	private function getBasePath()
+	private function getBasePath(): string
 	{
 		if ($this->basePath === null) {
 			$this->basePath = $this->url->getBasePath();

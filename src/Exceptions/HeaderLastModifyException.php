@@ -2,7 +2,7 @@
 
 namespace h4kuna\Assets\Exceptions;
 
-class HeaderLastModifyException extends \RuntimeException
+final class HeaderLastModifyException extends \RuntimeException
 {
 
 }

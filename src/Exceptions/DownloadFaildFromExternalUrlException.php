@@ -2,7 +2,7 @@
 
 namespace h4kuna\Assets\Exceptions;
 
-class DownloadFaildFromExternalUrlException extends \RuntimeException
+final class DownloadFaildFromExternalUrlException extends \RuntimeException
 {
 
 }

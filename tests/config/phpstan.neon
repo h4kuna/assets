@@ -1,0 +1,7 @@
+parameters:
+	autoload_files:
+		- %rootDir%/../../../tests/bootsrap.php
+	autoload_directories:
+		- %rootDir%/../../../tests/src/
+	ignoreErrors:
+		- '~return type has no value type specified in iterable type Nette\\Utils\\Html\.$~'

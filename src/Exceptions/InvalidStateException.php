@@ -2,7 +2,7 @@
 
 namespace h4kuna\Assets\Exceptions;
 
-class InvalidStateException extends \RuntimeException
+final class InvalidStateException extends \RuntimeException
 {
 
 }

@@ -2,7 +2,7 @@
 
 namespace h4kuna\Assets\Exceptions;
 
-class DuplicityAssetNameException extends \RuntimeException
+final class DuplicityAssetNameException extends \RuntimeException
 {
 
 }

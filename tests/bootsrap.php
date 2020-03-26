@@ -11,7 +11,7 @@ define('TEMP_DIR', __DIR__ . '/temp/' . getmypid());
 Nette\Utils\FileSystem::createDir(TEMP_DIR);
 Tracy\Debugger::enable(false, TEMP_DIR . '/..');
 
-function test(\Closure $closure)
+function test(\Closure $closure): void
 {
 	$closure();
 }

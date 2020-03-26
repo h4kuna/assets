@@ -1,7 +1,6 @@
 #!/bin/bash
 
 DIR=`pwd`/`dirname $0`;
-TEMP_DIR=$DIR/temp
 
 rm $DIR/../composer.lock
 cd $DIR/..

@@ -1,12 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets;
 
+use h4kuna\Assets\Exceptions\InvalidStateException;
+use Nette\Safe;
 use Nette\Utils;
 
 class CacheAssets
 {
-
 	/** @var bool */
 	private $debugMode;
 
@@ -20,7 +21,7 @@ class CacheAssets
 	private $save = false;
 
 
-	public function __construct($debugMode, $tempDir)
+	public function __construct(bool $debugMode, string $tempDir)
 	{
 		$this->debugMode = $debugMode;
 		$this->tempFile = $tempDir . DIRECTORY_SEPARATOR . '_assets';
@@ -31,11 +32,7 @@ class CacheAssets
 	}
 
 
-	/**
-	 * @param string $pathname
-	 * @return int
-	 */
-	public function load($pathname)
+	public function load(string $pathname): int
 	{
 		$this->loadCache();
 		if (isset($this->files[$pathname])) {
@@ -43,13 +40,13 @@ class CacheAssets
 		}
 
 		$this->save = true;
-		return $this->files[$pathname] = filemtime($pathname);
+		return $this->files[$pathname] = Safe::filemtime($pathname);
 	}
 
 
 	/**
 	 * Clear local cache
-	 * @return self
+	 * @return static
 	 */
 	public function clear()
 	{
@@ -59,7 +56,7 @@ class CacheAssets
 	}
 
 
-	private function loadCache()
+	private function loadCache(): void
 	{
 		if ($this->files !== null) {
 			return;

@@ -2,7 +2,7 @@
 
 namespace h4kuna\Assets\Exceptions;
 
-class CompareTokensException extends \RuntimeException
+final class CompareTokensException extends \RuntimeException
 {
 
 }

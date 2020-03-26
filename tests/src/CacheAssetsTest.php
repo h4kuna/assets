@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets;
 
 use Tester\Assert;
 
-require __DIR__ . '/../bootsrap.php';
+require_once __DIR__ . '/../bootsrap.php';
 
 test(function () {
 	$cache = createCache()->clear();

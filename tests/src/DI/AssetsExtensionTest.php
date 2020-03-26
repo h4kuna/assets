@@ -1,16 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets\DI;
 
-use h4kuna\Assets,
-	Nette\Bridges,
-	Nette\Utils,
-	Nette\DI AS NDI,
-	Tester\Assert;
+use h4kuna\Assets;
+use	Nette\Bridges;
+use	Nette\Utils;
+use	Nette\DI AS NDI;
+use	Tester\Assert;
 
-require __DIR__ . '/../../bootsrap.php';
+require_once __DIR__ . '/../../bootsrap.php';
 
-function createContainer(array $config)
+/**
+ * @param array<mixed> $config
+ */
+function createContainer(array $config): \Container
 {
 	$compiler = new NDI\Compiler();
 	$latteExtension = new Bridges\ApplicationDI\LatteExtension(TEMP_DIR);
@@ -36,13 +39,6 @@ Assert::exception(function () {
 
 Assert::exception(function () {
 	createContainer([
-		'externalAssets' => ['http://www.example.com/'],
-		'wwwTempDir' => TEMP_DIR . '/foo'
-	]);
-}, Assets\Exceptions\DirectoryIsNotWriteableException::class);
-
-Assert::exception(function () {
-	createContainer([
 		'externalAssets' => ['sha256-fljdfkuvzddfdvc' => 'http://example.com/']
 	]);
 }, Assets\Exceptions\CompareTokensException::class);
@@ -52,13 +48,6 @@ Assert::exception(function () {
 		'externalAssets' => [TEMP_DIR . '/_unkown.css']
 	]);
 }, Assets\Exceptions\FileNotFoundException::class);
-
-Assert::exception(function () {
-	createContainer([
-		'externalAssets' => [__DIR__ . '/assets/main.js'],
-		'wwwTempDir' => '/'
-	]);
-}, Assets\Exceptions\DirectoryIsNotWriteableException::class);
 
 Assert::exception(function () {
 	createContainer([
@@ -73,7 +62,7 @@ Assert::exception(function () {
 class CacheBuilder implements ICacheBuilder
 {
 
-	public function create(Assets\CacheAssets $cache, $wwwDir)
+	public function create(Assets\CacheAssets $cache, string $wwwDir): void
 	{
 		$mainJs = $wwwDir . '/temp/main.js';
 		touch($mainJs, 123456789);

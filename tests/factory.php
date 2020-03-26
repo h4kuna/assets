@@ -2,22 +2,24 @@
 
 namespace h4kuna\Assets;
 
-function createAssets($url = '', $debug = false)
+use Nette\Http\UrlScript;
+
+function createAssets(string $url = '', bool $debug = false): Assets
 {
 	return new Assets(createFile($url, $debug));
 }
 
-function createCache($debug = false)
+function createCache(bool $debug = false): CacheAssets
 {
 	return new CacheAssets($debug, TEMP_DIR);
 }
 
-function createUrl($url = '')
+function createUrl(string $url = ''): UrlScript
 {
 	return (new \Salamium\Testinium\HttpRequestFactory())->create($url)->getUrl();
 }
 
-function createFile($url = '', $debug = false)
+function createFile(string $url = '', bool $debug = false): File
 {
 	return new File(__DIR__, createUrl($url), createCache($debug));
 }

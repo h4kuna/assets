@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace h4kuna\Assets;
 
 use Tester\Assert;
 
-require __DIR__ . '/../bootsrap.php';
+require_once __DIR__ . '/../bootsrap.php';
 
 test(function () {
 	$time = filemtime(__DIR__ . '/../config/php.ini');
 
-	/* @var $file Assets\File */
+	/* @var $file File */
 	$file = createFile('//www.example.com');
 	Assert::same('/config/php.ini?' . $time, $file->createUrl('config/php.ini'));
 
