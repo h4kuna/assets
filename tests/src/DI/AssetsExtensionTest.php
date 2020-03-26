@@ -22,11 +22,13 @@ function createContainer(array $config): \Container
 	$compiler->addExtension('http', $httpExtension);
 
 	Utils\FileSystem::createDir(TEMP_DIR . '/temp');
-	$assetsExtension = new AssetsExtension(false, TEMP_DIR, TEMP_DIR);
-	$assetsExtension->setConfig($config);
+	$assetsExtension = new AssetsExtension(TEMP_DIR, TEMP_DIR);
+	$compiler->addConfig([
+		'assets' => $config
+	]);
 
 	$compiler->addExtension('assets', $assetsExtension);
-	//file_put_contents(__DIR__ . '/container.php', "<?php\n" . $compiler->compile());
+//	file_put_contents(__DIR__ . '/container.php', "<?php\n" . $compiler->compile());
 	eval($compiler->compile());
 	return new \Container();
 }

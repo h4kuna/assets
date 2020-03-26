@@ -10,10 +10,13 @@ Install via composer:
 $ composer require h4kuna/assets
 ```
 
-Version 0.1.3 supports PHP 5.3. Newer versions support PHP of version 5.6 and higher.
+# Changelog
+- 1.0.0 supports PHP 7.1+ (strict types)
+- 0.1.4 0.1.5 newer versions support PHP of version 5.6 and higher
+- 0.1.3 supports PHP 5.3
 
-How to use
-==========
+# How to use
+
 For first step you only need to register the extension, other parameters are optional. You have available the new filter **asset** automatically.
 
 ```sh
@@ -37,7 +40,7 @@ assetsExtension:
         'sha256-secure-token': http://example.com/foo.js # check if is right file
 ```
 
-Advantages:
+### Advantages:
 
 - $basePath is not needed
 - path is relative to your wwwDir
