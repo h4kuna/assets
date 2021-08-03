@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace h4kuna\Assets;
+namespace h4kuna\Tests\Assets;
 
+use h4kuna\Assets\Assets;
+use h4kuna\Assets\Exceptions;
 use Tester\Assert;
 
 require_once __DIR__ . '/../bootsrap.php';

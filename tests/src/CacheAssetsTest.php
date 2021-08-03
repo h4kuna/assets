@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace h4kuna\Assets;
+namespace h4kuna\Tests\Assets;
 
 use Tester\Assert;
 

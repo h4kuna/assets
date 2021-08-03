@@ -2,7 +2,6 @@
 
 namespace h4kuna\Assets;
 
-use h4kuna\Assets\Exceptions\InvalidStateException;
 use Nette\Safe;
 use Nette\Utils;
 
@@ -44,18 +43,6 @@ class CacheAssets
 	}
 
 
-	/**
-	 * Clear local cache
-	 * @return static
-	 */
-	public function clear()
-	{
-		$this->files = [];
-		$this->save = true;
-		return $this;
-	}
-
-
 	private function loadCache(): void
 	{
 		if ($this->files !== null) {
@@ -68,10 +55,22 @@ class CacheAssets
 	}
 
 
+	/**
+	 * Clear local cache
+	 * @return static
+	 */
+	public function clear()
+	{
+		$this->files = [];
+		$this->save = true;
+		return $this;
+	}
+
+
 	public function __destruct()
 	{
 		if ($this->debugMode === false && $this->save === true) {
-			file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, true) . ';');
+			Safe::file_put_contents($this->tempFile, '<?php return ' . var_export($this->files, true) . ';');
 		}
 	}
 

@@ -5,53 +5,25 @@ namespace h4kuna\Assets\DI;
 use h4kuna\Assets;
 use Nette\DI as NDI;
 use Nette\Safe;
-use Nette\Utils;
 use Nette\Schema;
+use Nette\Utils;
 
 class AssetsExtension extends NDI\CompilerExtension
 {
 	/** @var array<string, bool> */
 	private $duplicity = [];
 
-	/** @var string|null */
-	private $wwwDir;
-
-	/** @var string|null */
-	private $wwwTempDir;
-
-	/** @var string|null */
-	private $tempDir;
-
-
-	public function __construct(?string $wwwDir = null, ?string $tempDir = null)
-	{
-		if ($wwwDir !== null) {
-			$this->wwwDir = $wwwDir;
-			$this->wwwTempDir = $wwwDir . '/temp';
-		}
-
-		if ($tempDir !== null) {
-			$this->tempDir = $tempDir . DIRECTORY_SEPARATOR . 'cache';
-		}
-	}
-
-
-	public static function createSchema(): Schema\Schema
-	{
-		return Schema\Expect::structure([
-			'debugMode' => Schema\Expect::bool(false),
-			'wwwDir' => Schema\Expect::string(''),
-			'tempDir' => Schema\Expect::string(''),
-			'wwwTempDir' => Schema\Expect::string(''),
-			'cacheBuilder' => Schema\Expect::mixed(null),
-			'externalAssets' => Schema\Expect::arrayOf('string')
-		]);
-	}
-
 
 	public function getConfigSchema(): Schema\Schema
 	{
-		return self::createSchema();
+		return Schema\Expect::structure([
+			'debugMode' => Schema\Expect::bool(),
+			'wwwDir' => Schema\Expect::string(),
+			'tempDir' => Schema\Expect::string(),
+			'wwwTempDir' => Schema\Expect::string(),
+			'cacheBuilder' => Schema\Expect::mixed(),
+			'externalAssets' => Schema\Expect::arrayOf('string'),
+		]);
 	}
 
 
@@ -60,58 +32,27 @@ class AssetsExtension extends NDI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = (array) $this->getConfig();
 
-		if ($config['wwwDir'] === '' && $this->wwwDir !== null) {
-			$config['wwwDir'] = $this->wwwDir;
-		}
+		$config['wwwDir'] = $this->checkParameter($config, 'wwwDir');
+		$config['tempDir'] = $this->checkParameter($config, 'tempDir');
+		$config['debugMode'] = $this->checkParameter($config, 'debugMode');
+		$config['wwwTempDir'] = $this->checkParameter($config, 'wwwTempDir', $config['wwwDir'] . '/temp');
 
-		if ($config['tempDir'] === '' && $this->tempDir !== null) {
-			$config['tempDir'] = $this->tempDir;
-		}
+		$cacheAssets = $this->buildCacheAssets($config['debugMode'], $config['tempDir']);
 
-		if ($config['wwwTempDir'] === '' && $this->wwwTempDir !== null) {
-			$config['wwwTempDir'] = $this->wwwTempDir;
-		}
+		$assetFile = $this->buildAssetsFile($cacheAssets, $config['wwwDir'] ?? $builder->parameters['wwwDir']);
 
-		$cacheAssets = $builder->addDefinition($this->prefix('cache'))
-			->setFactory(Assets\CacheAssets::class, [$config['debugMode'], $config['tempDir']])
-			->setAutowired(false);
+		$this->buildAssets();
 
-		$assetFile = $builder->addDefinition($this->prefix('file'))
-			->setFactory(Assets\File::class, [
-				$config['wwwDir'],
-				new \Nette\DI\Definitions\Statement('?->getUrl()', ['@http.request']),
-				$cacheAssets
-			]);
+		$this->registerLatteFilter($assetFile);
 
-		$builder->addDefinition($this->prefix('assets'))
-			->setFactory(Assets\Assets::class);
-
-		$builder->getDefinition('latte.latteFactory')
-			->getResultDefinition()
-			->addSetup('addFilter', ['asset', new \Nette\DI\Definitions\Statement("[?, 'createUrl']", [$assetFile])]);
-
-		if ($config['externalAssets']) {
+		if ($config['externalAssets'] !== []) {
 			$this->saveExternalAssets($config['externalAssets'], $config['wwwTempDir']);
 		}
 
 		// build own cache
-		if ($config['cacheBuilder'] && $config['debugMode'] === false) {
+		if ($config['cacheBuilder'] !== null && $config['debugMode'] === false) {
 			$this->createAssetsCache($config['cacheBuilder'], $config['debugMode'], $config['tempDir'], $config['wwwDir']);
 		}
-	}
-
-
-	private function createAssetsCache(string $cacheBuilderClass, bool $debugMode, string $tempDir,string $wwwDir): void
-	{
-		/* @var $cacheBuilder ICacheBuilder */
-		$cacheBuilder = new $cacheBuilderClass;
-		if (!$cacheBuilder instanceof ICacheBuilder) {
-			throw new Assets\Exceptions\InvalidStateException('Option cacheBuilder must be class instance of ' . __NAMESPACE__ . '\\ICacheBuilder');
-		}
-
-		$cache = new Assets\CacheAssets($debugMode, $tempDir);
-		$cache->clear();
-		$cacheBuilder->create($cache, $wwwDir);
 	}
 
 
@@ -137,25 +78,9 @@ class AssetsExtension extends NDI\CompilerExtension
 	}
 
 
-	private function fromFs(string $file, string $newName, string $destination): string
-	{
-		if (is_numeric($newName)) {
-			$newName = basename($file);
-		}
-		$path = $destination . DIRECTORY_SEPARATOR . $newName;
-		if (!is_file($file)) {
-			throw new Assets\Exceptions\FileNotFoundException($file);
-		}
-		Utils\FileSystem::createDir(dirname($path));
-		$this->checkDuplicity($path);
-		Safe::copy($file, $path);// todo
-		return $path;
-	}
-
-
 	private static function isHttp(string $file): bool
 	{
-		return Utils\Strings::match($file, '~^http~') !== NULL;
+		return Utils\Strings::match($file, '~^http~') !== null;
 	}
 
 
@@ -179,7 +104,7 @@ class AssetsExtension extends NDI\CompilerExtension
 			[$function, $token] = explode('-', $hash, 2);
 			$secureToken = base64_encode(hash($function, $content, true));
 			if ($secureToken !== $token) {
-				throw new Assets\Exceptions\CompareTokensException('Expected token: ' . $token . ' and actual is: ' . $secureToken . '. Hash function is: "' . $function . '".');
+				throw new Assets\Exceptions\CompareTokensException(sprintf('Expected token: "%s" and actual is: "%s". Hash function is: "%s".', $token, $secureToken, $function));
 			}
 		}
 
@@ -210,6 +135,106 @@ class AssetsExtension extends NDI\CompilerExtension
 			return (int) $datetime->format('U');
 		}
 		throw new Assets\Exceptions\HeaderLastModifyException('Header Last-Modified not found for url: "' . $url . '". You can\'t use this automatically download. Let\'s save manually.');
+	}
+
+
+	private function fromFs(string $file, string $newName, string $destination): string
+	{
+		if (is_numeric($newName)) {
+			$newName = basename($file);
+		}
+		$path = $destination . DIRECTORY_SEPARATOR . $newName;
+		if (!is_file($file)) {
+			throw new Assets\Exceptions\FileNotFoundException($file);
+		}
+		Utils\FileSystem::createDir(dirname($path));
+		$this->checkDuplicity($path);
+		Safe::copy($file, $path);
+		return $path;
+	}
+
+
+	private function createAssetsCache(
+		string $cacheBuilderClass,
+		bool $debugMode,
+		string $tempDir,
+		string $wwwDir
+	): void
+	{
+		/* @var $cacheBuilder ICacheBuilder */
+		$cacheBuilder = new $cacheBuilderClass;
+		if (!$cacheBuilder instanceof ICacheBuilder) {
+			throw new Assets\Exceptions\InvalidStateException('Option cacheBuilder must be class instance of ' . __NAMESPACE__ . '\\ICacheBuilder');
+		}
+
+		$cache = new Assets\CacheAssets($debugMode, $tempDir);
+		$cache->clear();
+		$cacheBuilder->create($cache, $wwwDir);
+	}
+
+
+	private function buildCacheAssets(bool $debugMode, string $tempDir): NDI\Definitions\ServiceDefinition
+	{
+		return $this->getContainerBuilder()
+			->addDefinition($this->prefix('cache'))
+			->setFactory(Assets\CacheAssets::class, [$debugMode, $tempDir])
+			->setAutowired(false);
+	}
+
+
+	private function buildAssetsFile(
+		NDI\Definitions\Definition $cacheAssets,
+		string $wwwDir
+	): NDI\Definitions\ServiceDefinition
+	{
+		return $this->getContainerBuilder()
+			->addDefinition($this->prefix('file'))
+			->setFactory(Assets\File::class, [
+				$wwwDir,
+				new NDI\Definitions\Statement('?->getUrl()', ['@http.request']),
+				$cacheAssets,
+			]);
+	}
+
+
+	private function buildAssets(): void
+	{
+		$this->getContainerBuilder()
+			->addDefinition($this->prefix('assets'))
+			->setFactory(Assets\Assets::class);
+	}
+
+
+	/**
+	 * @param array<string, mixed> $config
+	 * @return mixed
+	 */
+	private function checkParameter(array $config, string $name, string $default = null)
+	{
+		if (isset($config[$name])) {
+			return $config[$name];
+		}
+
+		$builder = $this->getContainerBuilder();
+		if (isset($builder->parameters[$name])) {
+			return $builder->parameters[$name];
+		}
+
+		if ($default === null) {
+			throw new Assets\Exceptions\InvalidStateException(sprintf('Parameter %s is required.', $name));
+		}
+
+		return $default;
+	}
+
+
+	private function registerLatteFilter(NDI\Definitions\Definition $assetFile): void
+	{
+		$latteFactory = $this->getContainerBuilder()->getDefinition('latte.latteFactory');
+		assert($latteFactory instanceof NDI\Definitions\FactoryDefinition);
+
+		$latteFactory->getResultDefinition()
+			->addSetup('addFilter', ['asset', new NDI\Definitions\Statement("[?, 'createUrl']", [$assetFile])]);
 	}
 
 }

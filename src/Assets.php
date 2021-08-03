@@ -69,6 +69,16 @@ class Assets
 	}
 
 
+	private function createUrl(string $filename): string
+	{
+		if (preg_match('~[-a-z0-9]+\.[a-z]{2,6}/~i', $filename)) {
+			// is it contains domain?
+			return $filename;
+		}
+		return $this->file->createUrl($filename);
+	}
+
+
 	public function renderJs(): Utils\Html
 	{
 		if ($this->js === null) {
@@ -82,16 +92,6 @@ class Assets
 		}
 		$this->js = null;
 		return $html;
-	}
-
-
-	private function createUrl(string $filename): string
-	{
-		if (preg_match('~[-a-z0-9]+\.[a-z]{2,6}/~i', $filename)) {
-			// is it contains domain?
-			return $filename;
-		}
-		return $this->file->createUrl($filename);
 	}
 
 }

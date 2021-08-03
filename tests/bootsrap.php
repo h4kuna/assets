@@ -1,7 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
 include __DIR__ . '/../vendor/autoload.php';
-include __DIR__ . '/factory.php';
 
 Tester\Environment::setup();
 date_default_timezone_set('Europe/Prague');

@@ -1,7 +1,9 @@
 parameters:
-	autoload_files:
+	scanFiles:
 		- %rootDir%/../../../tests/bootsrap.php
-	autoload_directories:
+	scanDirectories:
 		- %rootDir%/../../../tests/src/
 	ignoreErrors:
 		- '~return type has no value type specified in iterable type Nette\\Utils\\Html\.$~'
+		- '~class Container~'
+		- '~has invalid type Container~'
