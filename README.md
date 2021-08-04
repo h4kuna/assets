@@ -11,6 +11,7 @@ $ composer require h4kuna/assets
 ```
 
 # Changelog
+- 1.1.0 nothing required, update nette 3.0
 - 1.0.0 supports PHP 7.1+ (strict types)
 - 0.1.4 0.1.5 newer versions support PHP of version 5.6 and higher
 - 0.1.3 supports PHP 5.3
@@ -21,15 +22,15 @@ For first step you only need to register the extension, other parameters are opt
 
 ```sh
 extensions:
-	assetsExtension: h4kuna\Assets\DI\AssetsExtension
+	assets: h4kuna\Assets\DI\AssetsExtension
 
-assetsExtension:
-    # required
+assets:
+    # required nothing
+    
+    # optional
     wwwDir: %wwwDir%
     debugMode: %debugMode%
     tempDir: %tempDir%
-    
-    # optional	
     wwwTempDir: %wwwDir%/temp # here is place where move assets from 3rd library (from vendor/ etc.)
     externalAssets:
         - %appDir%/../vendor/nette/nette.js # save to %wwwTempDir%/nette.js
