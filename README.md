@@ -1,4 +1,5 @@
 # Abandoned
+try [68publishers/asset](//github.com/68publishers/asset)
 
 [![Build Status](https://travis-ci.org/h4kuna/assets.svg?branch=master)](https://travis-ci.org/h4kuna/assets)
 [![Downloads this Month](https://img.shields.io/packagist/dm/h4kuna/assets.svg)](https://packagist.org/packages/h4kuna/assets)
